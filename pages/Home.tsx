@@ -24,9 +24,10 @@ const POPULAR_PRODUCTS: Product[] = [
 
 interface HomeProps {
   navigate: (page: Page) => void;
+  addToCart?: (product: Product) => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ navigate }) => {
+export const Home: React.FC<HomeProps> = ({ navigate, addToCart }) => {
   return (
     <div className="flex flex-col w-full overflow-hidden bg-gray-50/50">
       
@@ -194,7 +195,7 @@ export const Home: React.FC<HomeProps> = ({ navigate }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {POPULAR_PRODUCTS.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
             ))}
           </div>
           

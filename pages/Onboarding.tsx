@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Page } from '../App';
-import { Store, ShoppingBag, MapPin, Check } from 'lucide-react';
+import { Store, ShoppingBag, MapPin, Check, ArrowLeft } from 'lucide-react';
+import { getAuthImage } from '../utils/images';
+import { Logo } from '../components/Logo';
 
 interface OnboardingProps {
   navigate: (page: Page) => void;
@@ -15,6 +17,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ navigate }) => {
   const [step, setStep] = useState<Step>(1);
   const [role, setRole] = useState<Role>(null);
   const [zone, setZone] = useState<Zone>(null);
+  
+  // Reuse the same background image style as Register for consistency
+  const bgImage = getAuthImage('register');
 
   const zones = [
     { id: 'A', name: 'Zone A', location: 'Muha', desc: 'Sud de Bujumbura' },
@@ -23,99 +28,121 @@ export const Onboarding: React.FC<OnboardingProps> = ({ navigate }) => {
   ];
 
   const handleFinish = () => {
-    // Ici, on enverrait les données au backend (rôle + zone)
-    console.log('Onboarding complete:', { role, zone });
-    navigate('home');
+    // Redirection basée sur le rôle choisi
+    if (role === 'seller') {
+      navigate('seller-dashboard');
+    } else {
+      navigate('buyer-dashboard');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
-        
-        {/* Sidebar / Progress */}
-        <div className="w-full md:w-1/3 bg-[#01003c] p-10 flex flex-col justify-between text-white relative overflow-hidden">
-           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-[#01003c] to-[#01003c]"></div>
-           <div className="relative z-10">
-             <h2 className="text-2xl font-display font-bold mb-2">Configuration</h2>
-             <p className="text-blue-200 text-sm">Finalisons votre profil pour une meilleure expérience.</p>
-           </div>
-           
-           <div className="relative z-10 space-y-8 my-8">
-              <div className={`flex items-center gap-4 ${step === 1 ? 'opacity-100' : 'opacity-50'}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === 1 ? 'border-soko-orange text-soko-orange bg-white' : 'border-gray-500 text-gray-500'}`}>
-                  {step > 1 ? <Check size={20} /> : '1'}
-                </div>
-                <div className="font-bold">Votre Rôle</div>
-              </div>
-              <div className={`flex items-center gap-4 ${step === 2 ? 'opacity-100' : 'opacity-50'}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step === 2 ? 'border-soko-orange text-soko-orange bg-white' : 'border-gray-500 text-gray-500'}`}>
-                  2
-                </div>
-                <div className="font-bold">Votre Zone</div>
-              </div>
-           </div>
+    <div className="min-h-screen flex relative">
+       {/* Bouton retour (seulement si step 2 pour revenir au step 1, sinon on ne retourne pas à register pour éviter confusion) */}
+       {step === 2 && (
+        <button 
+          onClick={() => setStep(1)} 
+          className="absolute top-8 left-8 z-20 flex items-center gap-2 text-sm text-gray-500 hover:text-soko-dark transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100"
+        >
+          <ArrowLeft size={16} /> Retour
+        </button>
+       )}
 
-           <div className="relative z-10 text-xs text-blue-200/60">
-             Étape {step} sur 2
-           </div>
-        </div>
+       {/* Right Side - Image/Branding (Identique à Register pour la continuité) */}
+       <div className="hidden lg:flex w-1/2 bg-gray-900 relative items-center justify-center overflow-hidden order-last">
+          <div 
+              className="absolute inset-0 bg-cover bg-center opacity-40"
+              style={{ backgroundImage: `url("${bgImage}")` }}
+          ></div>
+          <div className="relative z-10 p-12 text-white max-w-lg text-center">
+             <h1 className="text-4xl font-display font-bold mb-6">Quelques détails de plus.</h1>
+             <p className="text-lg text-gray-300 leading-relaxed mb-8">
+               Nous personnalisons votre expérience SokoLink en fonction de vos besoins et de votre localisation.
+             </p>
+             
+             {/* Progress Steps Visual (Vertical on Desktop sidebar similar to previous design but integrated) */}
+             <div className="flex flex-col items-start gap-6 bg-white/10 p-8 rounded-3xl backdrop-blur-sm text-left w-full max-w-sm mx-auto">
+                <div className={`flex items-center gap-4 transition-opacity duration-300 ${step === 1 ? 'opacity-100' : 'opacity-50'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold border ${step === 1 ? 'bg-soko-orange border-soko-orange text-white' : 'border-white text-white'}`}>
+                    {step > 1 ? <Check size={16} /> : '1'}
+                  </div>
+                  <span className="font-bold">Votre Rôle</span>
+                </div>
+                
+                {/* Connector Line */}
+                <div className="w-0.5 h-6 bg-white/20 ml-4 -my-2"></div>
 
-        {/* Content Area */}
-        <div className="w-full md:w-2/3 p-10 md:p-14 flex flex-col items-center justify-center bg-white relative">
-           
-           {/* Step 1: Role Selection */}
-           {step === 1 && (
-             <div className="w-full animate-fade-in-up">
-               <h3 className="text-2xl font-bold font-display text-soko-dark mb-8 text-center">Comment souhaitez-vous utiliser SokoLink ?</h3>
-               
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                  <button 
+                <div className={`flex items-center gap-4 transition-opacity duration-300 ${step === 2 ? 'opacity-100' : 'opacity-50'}`}>
+                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold border ${step === 2 ? 'bg-soko-orange border-soko-orange text-white' : 'border-white text-white'}`}>
+                    2
+                  </div>
+                  <span className="font-bold">Votre Zone</span>
+                </div>
+             </div>
+          </div>
+       </div>
+
+       {/* Left Side - Content Forms */}
+       <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-8">
+          <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl shadow-gray-200/50">
+             
+             <div className="text-center mb-8">
+                <Logo className="mx-auto mb-6 justify-center" />
+                <h2 className="text-2xl font-extrabold font-display text-soko-dark mb-2">
+                  {step === 1 ? 'Votre profil' : 'Votre localisation'}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Étape {step} sur 2
+                </p>
+             </div>
+
+             {/* STEP 1: ROLE */}
+             {step === 1 && (
+               <div className="space-y-4 animate-fade-in-up">
+                 <button 
                     onClick={() => setRole('buyer')}
-                    className={`p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center text-center gap-4 hover:shadow-lg ${role === 'buyer' ? 'border-soko-orange bg-orange-50/50' : 'border-gray-100 hover:border-gray-200'}`}
+                    className={`w-full p-4 rounded-xl border-2 transition-all duration-300 flex items-center gap-4 hover:shadow-md text-left ${role === 'buyer' ? 'border-soko-orange bg-orange-50/50' : 'border-gray-100 hover:border-gray-200'}`}
                   >
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${role === 'buyer' ? 'bg-soko-orange text-white' : 'bg-gray-100 text-gray-500'}`}>
-                      <ShoppingBag size={28} />
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${role === 'buyer' ? 'bg-soko-orange text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <ShoppingBag size={20} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-soko-dark text-lg">Acheteur</h4>
-                      <p className="text-xs text-gray-500 mt-1">Je veux découvrir et acheter des produits locaux.</p>
+                      <h4 className="font-bold text-soko-dark">Acheteur</h4>
+                      <p className="text-xs text-gray-500">Je veux acheter des produits.</p>
                     </div>
+                    {role === 'buyer' && <Check className="ml-auto text-soko-orange" size={20} />}
                   </button>
 
                   <button 
                     onClick={() => setRole('seller')}
-                    className={`p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center text-center gap-4 hover:shadow-lg ${role === 'seller' ? 'border-soko-orange bg-orange-50/50' : 'border-gray-100 hover:border-gray-200'}`}
+                    className={`w-full p-4 rounded-xl border-2 transition-all duration-300 flex items-center gap-4 hover:shadow-md text-left ${role === 'seller' ? 'border-soko-orange bg-orange-50/50' : 'border-gray-100 hover:border-gray-200'}`}
                   >
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${role === 'seller' ? 'bg-soko-orange text-white' : 'bg-gray-100 text-gray-500'}`}>
-                      <Store size={28} />
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${role === 'seller' ? 'bg-soko-orange text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <Store size={20} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-soko-dark text-lg">Vendeur</h4>
-                      <p className="text-xs text-gray-500 mt-1">Je veux vendre mes produits à la communauté.</p>
+                      <h4 className="font-bold text-soko-dark">Vendeur</h4>
+                      <p className="text-xs text-gray-500">Je veux vendre mes produits.</p>
                     </div>
+                     {role === 'seller' && <Check className="ml-auto text-soko-orange" size={20} />}
                   </button>
+
+                  <Button 
+                    variant="primary" 
+                    fullWidth 
+                    size="lg" 
+                    className="mt-6 shadow-orange-500/25"
+                    disabled={!role}
+                    onClick={() => setStep(2)}
+                  >
+                    Continuer
+                  </Button>
                </div>
+             )}
 
-               <Button 
-                variant="primary" 
-                fullWidth 
-                size="lg" 
-                disabled={!role}
-                onClick={() => setStep(2)}
-               >
-                 Continuer
-               </Button>
-             </div>
-           )}
-
-           {/* Step 2: Zone Selection */}
-           {step === 2 && (
-             <div className="w-full animate-fade-in-up">
-               <button onClick={() => setStep(1)} className="text-sm text-gray-400 mb-6 hover:text-soko-dark">← Retour</button>
-               <h3 className="text-2xl font-bold font-display text-soko-dark mb-2 text-center">Où êtes-vous situé ?</h3>
-               <p className="text-center text-gray-500 mb-8 text-sm">Cela nous aide à vous montrer les offres les plus proches.</p>
-               
-               <div className="space-y-4 mb-10">
+             {/* STEP 2: ZONE */}
+             {step === 2 && (
+               <div className="space-y-4 animate-fade-in-up">
                   {zones.map((z) => (
                     <button 
                       key={z.id}
@@ -123,34 +150,34 @@ export const Onboarding: React.FC<OnboardingProps> = ({ navigate }) => {
                       className={`w-full p-4 rounded-xl border-2 flex items-center gap-4 transition-all hover:shadow-md text-left ${zone === z.id ? 'border-soko-orange bg-orange-50/30' : 'border-gray-100 hover:border-gray-200'}`}
                     >
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${zone === z.id ? 'bg-soko-orange text-white' : 'bg-gray-100 text-gray-400'}`}>
-                        <MapPin size={20} />
+                        <MapPin size={18} />
                       </div>
                       <div className="flex-grow">
                         <div className="flex justify-between items-center">
                           <span className="font-bold text-soko-dark">{z.name}</span>
-                          <span className="text-xs font-semibold bg-gray-100 px-2 py-1 rounded text-gray-600">{z.location}</span>
+                          <span className="text-[10px] font-semibold bg-gray-100 px-2 py-1 rounded text-gray-600 uppercase">{z.location}</span>
                         </div>
-                        <p className="text-xs text-gray-500">{z.desc}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{z.desc}</p>
                       </div>
                       {zone === z.id && <Check className="text-soko-orange" size={20} />}
                     </button>
                   ))}
+
+                  <Button 
+                    variant="primary" 
+                    fullWidth 
+                    size="lg" 
+                    className="mt-6 shadow-orange-500/25"
+                    disabled={!zone}
+                    onClick={handleFinish}
+                  >
+                    Terminer
+                  </Button>
                </div>
+             )}
 
-               <Button 
-                variant="primary" 
-                fullWidth 
-                size="lg" 
-                disabled={!zone}
-                onClick={handleFinish}
-               >
-                 Terminer l'inscription
-               </Button>
-             </div>
-           )}
-
-        </div>
-      </div>
+          </div>
+       </div>
     </div>
   );
 };
