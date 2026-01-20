@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Premium Text Gradient Utility */
+.text-gradient-premium {
+  background: linear-gradient(135deg, #01003c 0%, #4354ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
